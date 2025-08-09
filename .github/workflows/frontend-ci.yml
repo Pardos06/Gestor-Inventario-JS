@@ -24,9 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: false
-    # cache: 'npm'
-    # cache-dependency-path: gestion-inventario-frontend/package-lock.json
+  # cache: 'npm'
+  # cache-dependency-path: gestion-inventario-frontend/package-lock.json
+
+
       - name: List frontend directory contents (diagnóstico)
         run: ls -la gestion-inventario-frontend
 
