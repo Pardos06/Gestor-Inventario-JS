@@ -2,38 +2,42 @@ name: Frontend Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [main]
     paths:
-      - 'frontend/**'
+      - 'gestion-inventario-frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'gestion-inventario-frontend/**'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: gestion-inventario-frontend/package-lock.json
 
-    - name: Install dependencies (frontend)
-      working-directory: ./frontend
-      run: npm ci
+      - name: List frontend directory contents (diagnóstico)
+        run: ls -la gestion-inventario-frontend
 
-    - name: Build frontend
-      working-directory: ./frontend
-      run: npm run build
+      - name: Install dependencies (frontend)
+        run: npm ci
+        working-directory: gestion-inventario-frontend
 
-    - name: Run tests (frontend)
-      working-directory: ./frontend
-      run: npm test
+      - name: Build frontend
+        run: npm run build
+        working-directory: gestion-inventario-frontend
+
+      - name: Run tests (frontend)
+        run: npm test
+        working-directory: gestion-inventario-frontend

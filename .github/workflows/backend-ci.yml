@@ -3,6 +3,8 @@ name: Backend Node.js CI
 on:
   push:
     branches: [main]
+    paths:
+      - 'gestion-inventario-backend/**'
   pull_request:
     branches: [main]
     paths:
