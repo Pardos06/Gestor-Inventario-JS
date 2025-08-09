@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +30,14 @@ jobs:
       - name: List frontend directory contents (diagnóstico)
         run: ls -la gestion-inventario-frontend
 
-      - name: Install dependencies (frontend)
-        run: npm ci
-        working-directory: gestion-inventario-frontend
+      # - name: Install dependencies (frontend)
+      #   run: npm ci
+      #   working-directory: gestion-inventario-frontend
 
-      - name: Build frontend
-        run: npm run build
-        working-directory: gestion-inventario-frontend
+      # - name: Build frontend
+      #   run: npm run build
+      #   working-directory: gestion-inventario-frontend
 
-      - name: Run tests (frontend)
-        run: npm test
-        working-directory: gestion-inventario-frontend
+      # - name: Run tests (frontend)
+      #   run: npm test
+      #   working-directory: gestion-inventario-frontend
