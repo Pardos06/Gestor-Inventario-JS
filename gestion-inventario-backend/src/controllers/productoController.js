@@ -50,6 +50,3 @@ module.exports = {
   putProducto,
   deleteProducto
 };
-// Exportamos las funciones del controlador para que puedan ser utilizadas en las rutas
-// y así manejar las operaciones CRUD de los productos. Cada función maneja una operación específica
-// en el modelo de datos y devuelve una respuesta con el resultado de la operación realizada.
