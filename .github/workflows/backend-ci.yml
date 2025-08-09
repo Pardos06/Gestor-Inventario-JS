@@ -25,17 +25,28 @@ jobs:
           cache: 'npm'
           cache-dependency-path: gestion-inventario-backend/package-lock.json
 
+      - name: Show Node and npm versions
+        run: |
+          node -v
+          npm -v
+
       - name: List backend directory contents (diagnóstico)
         run: ls -la gestion-inventario-backend
 
       - name: Install dependencies (backend)
-        run: npm ci
+        run: |
+          set -o pipefail
+          npm ci --verbose | tee npm-ci.log
         working-directory: gestion-inventario-backend
 
       - name: Build backend (if applicable)
-        run: npm run build --if-present
+        run: |
+          set -o pipefail
+          npm run build --if-present --verbose | tee npm-build.log
         working-directory: gestion-inventario-backend
 
       - name: Run tests (backend)
-        run: npm test
+        run: |
+          set -o pipefail
+          npm test --verbose | tee npm-test.log
         working-directory: gestion-inventario-backend
