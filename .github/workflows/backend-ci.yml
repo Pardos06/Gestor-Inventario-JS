@@ -26,14 +26,17 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: List backend directory contents (diagnóstico)
+      run: ls -la ${{ github.workspace }}/backend
+
     - name: Install dependencies (backend)
-      working-directory: ./backend
       run: npm ci
+      working-directory: ${{ github.workspace }}/backend
 
     - name: Build backend (if applicable)
-      working-directory: ./backend
       run: npm run build --if-present
+      working-directory: ${{ github.workspace }}/backend
 
     - name: Run tests (backend)
-      working-directory: ./backend
       run: npm test
+      working-directory: ${{ github.workspace }}/backend
