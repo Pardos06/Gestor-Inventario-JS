@@ -3,10 +3,12 @@ name: Backend Node.js CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'gestion-inventario-backend/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'backend/**'
+      - 'gestion-inventario-backend/**'
 
 jobs:
   build:
@@ -27,16 +29,16 @@ jobs:
         cache: 'npm'
 
     - name: List backend directory contents (diagnóstico)
-      run: ls -la ${{ github.workspace }}/backend
+      run: ls -la ${{ github.workspace }}/gestion-inventario-backend
 
     - name: Install dependencies (backend)
       run: npm ci
-      working-directory: ${{ github.workspace }}/backend
+      working-directory: ${{ github.workspace }}/gestion-inventario-backend
 
     - name: Build backend (if applicable)
       run: npm run build --if-present
-      working-directory: ${{ github.workspace }}/backend
+      working-directory: ${{ github.workspace }}/gestion-inventario-backend
 
     - name: Run tests (backend)
       run: npm test
-      working-directory: ${{ github.workspace }}/backend
+      working-directory: ${{ github.workspace }}/gestion-inventario-backend
