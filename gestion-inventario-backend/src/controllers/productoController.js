@@ -43,7 +43,6 @@ async function deleteProducto(req, res, next) {
   }
 }
 
-
 module.exports = {
   getProductos,
   postProducto,
