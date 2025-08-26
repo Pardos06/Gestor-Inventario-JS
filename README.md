@@ -1,87 +1,173 @@
-# Gestor-Inventario-JS
+# 📦 Gestión de Inventario - Backend
 
--- Crear base de datos con nombre más general
-CREATE DATABASE GestionInventario;
-GO
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge\&logo=node.js\&logoColor=white) ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge\&logo=express\&logoColor=white) ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge\&logo=microsoft-sql-server\&logoColor=white) ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge\&logo=json-web-tokens\&logoColor=white)
 
-USE GestionInventario;
-GO
+¡Bienvenido al backend del sistema de **Gestión de Inventario**! Este proyecto está desarrollado con Node.js, Express y SQL Server, e integra autenticación con JWT, gestión de roles y correo electrónico para recuperación y confirmación de cuentas.
 
--- Tabla Roles
+---
+
+## 🔍 Descripción del Proyecto
+
+Este backend permite:
+
+* Registro, confirmación y autenticación de usuarios.
+* Recuperación y restablecimiento de contraseñas.
+* Gestión de roles y permisos (Gerente General, Encargado de Almacén, Empleado de Tienda).
+* Obtención, actualización y eliminación de usuarios según permisos.
+* Integración con SQL Server para almacenamiento seguro de información.
+* Seguridad basada en JWT y validaciones con express-validator.
+
+![Workflow](https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif)
+
+---
+
+## ⚙️ Tecnologías Utilizadas
+
+* **Backend:** Node.js + Express
+* **Base de Datos:** SQL Server
+* **Autenticación:** JWT
+* **Validaciones:** express-validator
+* **Envío de correos:** Nodemailer (Gmail)
+* **Gestión de contraseñas:** bcrypt
+* **Variables de entorno:** dotenv
+
+---
+
+## 🗂 Estructura del Proyecto
+
+```
+gestion-inventario-backend/
+├─ src/
+│  ├─ controllers/       # Lógica de los endpoints
+│  ├─ middlewares/       # Middleware de auth, roles y validación
+│  ├─ models/            # Modelos y consultas SQL
+│  ├─ routes/            # Definición de rutas de usuarios
+│  └─ services/          # Servicio de envío de correos
+├─ .env                  # Variables de entorno
+├─ package.json          # Dependencias y scripts
+└─ README.md
+```
+
+---
+
+## 📝 Instalación y Configuración
+
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/tu-usuario/gestion-inventario-backend.git
+cd gestion-inventario-backend
+```
+
+2. Instalar dependencias:
+
+```bash
+npm install
+```
+
+3. Crear archivo `.env` en la raíz con el siguiente contenido:
+
+```env
+DB_USER=gestion_user
+DB_PASS=123456789
+DB_SERVER=localhost
+DB_NAME=GestionInventario
+PORT=3000
+
+JWT_SECRET=Universidad2025
+JWT_EXPIRATION=8h
+
+EMAIL_SERVICE=gmail
+EMAIL_USER=vitoroy06@gmail.com
+EMAIL_PASS=tu_contraseña
+EMAIL_FROM='Gestion Inventario <vitoroy06@gmail.com>'
+FRONTEND_URL=http://localhost:3000
+
+TOKEN_EXPIRATION_RECOVERY=1h
+TOKEN_EXPIRATION_CONFIRM=24h
+```
+
+4. Asegúrate de tener la base de datos y las tablas creadas:
+
+```sql
 CREATE TABLE Rol (
-    IdRol INT PRIMARY KEY IDENTITY(1,1),
-    NombreRol NVARCHAR(50) NOT NULL UNIQUE
+  IdRol INT PRIMARY KEY IDENTITY(1,1),
+  NombreRol NVARCHAR(50) NOT NULL UNIQUE
 );
 
--- Tabla Usuarios
-CREATE TABLE Usuario (
-    IdUsuario INT PRIMARY KEY IDENTITY(1,1),
-    Nombre NVARCHAR(100) NOT NULL,
-    Apellido NVARCHAR(100) NOT NULL,
-    Correo NVARCHAR(150) NOT NULL UNIQUE,
-    Contrasena NVARCHAR(256) NOT NULL,
-    IdRol INT NOT NULL,
-    CONSTRAINT FK_Usuario_Rol FOREIGN KEY (IdRol) REFERENCES Rol(IdRol)
+CREATE TABLE Usuarios (
+  IdUsuario INT PRIMARY KEY IDENTITY(1,1),
+  Nombre NVARCHAR(100),
+  Apellido NVARCHAR(100),
+  Correo NVARCHAR(100) UNIQUE,
+  Contrasena NVARCHAR(255),
+  IdRol INT FOREIGN KEY REFERENCES Rol(IdRol),
+  Confirmado BIT DEFAULT 0,
+  TokenConfirmacion NVARCHAR(255) NULL,
+  TokenRecuperacion NVARCHAR(255) NULL,
+  ExpiracionToken DATETIME NULL
 );
+```
 
--- Tabla Proveedores
-CREATE TABLE Proveedor (
-    IdProveedor INT PRIMARY KEY IDENTITY(1,1),
-    NombreProveedor NVARCHAR(150) NOT NULL,
-    Contacto NVARCHAR(100),
-    Telefono NVARCHAR(20),
-    Correo NVARCHAR(150)
-);
+5. Iniciar servidor:
 
--- Tabla Sucursales
-CREATE TABLE Sucursal (
-    IdSucursal INT PRIMARY KEY IDENTITY(1,1),
-    NombreSucursal NVARCHAR(100) NOT NULL,
-    Direccion NVARCHAR(200)
-);
+```bash
+npm start
+```
 
--- Tabla Productos
-CREATE TABLE Producto (
-    IdProducto INT PRIMARY KEY IDENTITY(1,1),
-    NombreProducto NVARCHAR(150) NOT NULL,
-    Descripcion NVARCHAR(500),
-    Precio DECIMAL(10, 2) NOT NULL,
-    IdProveedor INT,
-    CONSTRAINT FK_Producto_Proveedor FOREIGN KEY (IdProveedor) REFERENCES Proveedor(IdProveedor)
-);
+Servidor corriendo en: `http://localhost:3000`
 
--- Tabla Inventario
-CREATE TABLE Inventario (
-    IdInventario INT PRIMARY KEY IDENTITY(1,1),
-    IdProducto INT NOT NULL,
-    IdSucursal INT NOT NULL,
-    Cantidad INT NOT NULL CHECK (Cantidad >= 0),
-    CONSTRAINT FK_Inventario_Producto FOREIGN KEY (IdProducto) REFERENCES Producto(IdProducto),
-    CONSTRAINT FK_Inventario_Sucursal FOREIGN KEY (IdSucursal) REFERENCES Sucursal(IdSucursal),
-    CONSTRAINT UQ_Inventario UNIQUE (IdProducto, IdSucursal)
-);
+---
 
--- Tabla MovimientoInventario
-CREATE TABLE MovimientoInventario (
-    IdMovimiento INT PRIMARY KEY IDENTITY(1,1),
-    IdProducto INT NOT NULL,
-    IdSucursal INT NOT NULL,
-    IdUsuario INT NOT NULL,
-    TipoMovimiento NVARCHAR(20) NOT NULL CHECK (TipoMovimiento IN ('Ingreso', 'Salida', 'Devolución')),
-    Cantidad INT NOT NULL CHECK (Cantidad > 0),
-    FechaMovimiento DATETIME NOT NULL DEFAULT GETDATE(),
-    Comentarios NVARCHAR(500),
-    CONSTRAINT FK_Movimiento_Producto FOREIGN KEY (IdProducto) REFERENCES Producto(IdProducto),
-    CONSTRAINT FK_Movimiento_Sucursal FOREIGN KEY (IdSucursal) REFERENCES Sucursal(IdSucursal),
-    CONSTRAINT FK_Movimiento_Usuario FOREIGN KEY (IdUsuario) REFERENCES Usuario(IdUsuario)
-);
+## 🚀 Uso de la API
 
-ALTER TABLE Producto
-ADD 
-    Stock INT NOT NULL DEFAULT 0,
-    FechaIngreso DATETIME NOT NULL DEFAULT GETDATE(),
-    Imagen VARBINARY(MAX) NULL,
-    Marca NVARCHAR(100) NULL;
+### Autenticación
 
-UPDATE Producto
-SET FechaIngreso = CAST(FechaIngreso AS DATE);
+* **Registro:** `POST /usuarios/registro`
+* **Confirmación de cuenta:** `GET /usuarios/confirmar/:token`
+* **Login:** `POST /usuarios/login`
+* **Recuperar contraseña:** `POST /usuarios/recuperar`
+* **Restablecer contraseña:** `POST /usuarios/restablecer/:token`
+
+### Gestión de Usuarios
+
+* **Obtener todos los usuarios:** `GET /usuarios` *(solo Gerente General)*
+* **Obtener usuario por ID:** `GET /usuarios/:id`
+* **Actualizar usuario:** `PUT /usuarios/:id`
+* **Eliminar usuario:** `DELETE /usuarios/:id`
+* **Cambiar contraseña:** `PUT /usuarios/cambiar-contrasena/:id`
+
+> 🔐 Todas las rutas críticas requieren token JWT en el header:
+>
+> ```
+> Authorization: Bearer <TU_TOKEN>
+> ```
+
+![API](https://media.giphy.com/media/l41lXQx6PPzOeO7Es/giphy.gif)
+
+---
+
+## 🔒 Seguridad
+
+* Los usuarios deben confirmar su correo para activar la cuenta.
+* Contraseñas encriptadas con **bcrypt**.
+* Validaciones estrictas de datos con **express-validator**.
+* Control de acceso mediante **roles** definidos en el JWT.
+
+---
+
+## 📫 Contacto
+
+* **Desarrollador:** Roy Vito
+* **Email:** [vitoroy06@gmail.com](mailto:vitoroy06@gmail.com)
+* **Proyecto:** [GitHub Repository](https://github.com/tu-usuario/gestion-inventario-backend)
+
+---
+
+## 🌟 Notas
+
+* Proyecto diseñado para **entornos de aprendizaje y pruebas locales**.
+* Puedes integrar con un frontend en React o Angular usando el token JWT para autenticación.
+* Asegúrate de configurar correctamente las tablas y roles antes de probar los endpoints.
+
+![End](https://media.giphy.com/media/3o7qDEq2bMbcbPRQ2c/giphy.gif)
